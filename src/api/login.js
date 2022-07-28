@@ -6,7 +6,8 @@ const router = express.Router();
 
 router.post('/login', async (req, res) => {
 
-    const { email, password } = req.body;
+
+    const { name, email, password } = req.body;
 
     const userWithEmail = await User.findOne({ where: { email } }).catch((err) => {
         console.log("Error ", err)
@@ -21,8 +22,9 @@ router.post('/login', async (req, res) => {
     
     const jwtToken = jwt.sign({ id: userWithEmail.id, email: userWithEmail.email }, process.env.JWT_SECRET);
 
-    res.json({ message: 'Tekrar Hoş Geldiniz... Tokeniniz: ', token: jwtToken }); 
+    res.status(200).json({userWithEmail, message: 'merhaba' + ' ' + name, token: jwtToken }); 
 
 })
+
 
 module.exports = router;

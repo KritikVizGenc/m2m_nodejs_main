@@ -3,10 +3,11 @@ const User = require("../models/user")
 
 const router = express.Router();
 
-router.post("/register", async (req,res) => {
-
-    const { fullName, email, password } = req.body;
-
+router.post("/register", async (req,res) => {   
+    
+    const { name, surname, email, password, user_role } = req.body;
+    
+    
     const alreadyExistUser = await User.findOne({ where: { email } }).catch((err) => {
         console.log(err)
     });
@@ -14,16 +15,19 @@ router.post("/register", async (req,res) => {
     if(alreadyExistUser){
         return res.json({ message: "User with email already exists! "})
     }
+
     
-    const newUser = new User({ fullName, email, password });
+    const newUser = new User({ name, surname, email, password, user_role });
+    
+
     const savedUser = await newUser.save().catch((err) => {
         console.log("Error: ", err)
         res.json({error: "Cannot register user at the momnet!"})
-
+        
     })
 
     if(savedUser){
-        res.json({newUser})
+        res.status(201).json({newUser})
     }
 })
 
