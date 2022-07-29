@@ -10,7 +10,7 @@ router.post("/register", async (req,res) => {
     
     const alreadyExistUser = await User.findOne({ where: { email } }).catch((err) => {
         console.log(err)
-    });
+    }); 
 
     if(alreadyExistUser){
         return res.json({ message: "User with email already exists! "})

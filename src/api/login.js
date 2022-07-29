@@ -26,5 +26,21 @@ router.post('/login', async (req, res) => {
 
 })
 
+router.delete('/deleteUser/:id', async (req, res) => {
+
+
+    const user = await User.destroy({ where: { id: req.params.id } })
+    
+
+    
+    if(!user)
+        return res.json({ message: 'User could not found' });
+    
+    
+
+    res.status(200).json({ message: 'Successful'  }); 
+
+})
+
 
 module.exports = router;

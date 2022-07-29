@@ -52,4 +52,4 @@ const Role = sequelize.define('role_table', {
 
 
 
-module.exports = User;
+module.exports = User, Role, USER_HAS_ROLE;
