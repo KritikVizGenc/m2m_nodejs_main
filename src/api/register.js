@@ -13,7 +13,7 @@ router.post("/register", async (req,res) => {
     }); 
 
     if(alreadyExistUser){
-        return res.json({ message: "User with email already exists! "})
+        return res.json({ message: "User with email already exists! ",email})
     }
 
     
@@ -27,7 +27,8 @@ router.post("/register", async (req,res) => {
     })
 
     if(savedUser){
-        res.status(201).json({newUser})
+        
+        res.status(201).json({message: "New registration received: ", newUser:name})
     }
 })
 
