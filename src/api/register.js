@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/user")
-
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 router.post("/register", async (req,res) => {   
@@ -27,8 +27,10 @@ router.post("/register", async (req,res) => {
     })
 
     if(savedUser){
-        
-        res.status(201).json({message: "New registration received: ", newUser:name})
+        const jwtToken = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET);
+
+        res.status(201).json({newUser, token: jwtToken }); 
+
     }
 })
 
