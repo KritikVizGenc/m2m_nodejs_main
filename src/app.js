@@ -14,7 +14,7 @@ require("./auth/passport")
 require("./models/user")
 
 const middlewares = require('./middlewares');
-const api = require('./api');
+const controller = require('./controller');
 
 const app = express();
 
@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.use('/api', api);
+app.use('/api', controller);
 
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);

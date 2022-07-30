@@ -26,13 +26,14 @@ const User = sequelize.define('user_table', {
 
 const Role = sequelize.define('role_table', {
 
-    role_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    }
-  });
+  role_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  }
+});
 
-  const USER_HAS_ROLE = sequelize.define('user_has_role', {
+
+const USER_HAS_ROLE = sequelize.define('user_has_role', {
 
     user_id: {
       type: DataTypes.INTEGER,
@@ -52,4 +53,4 @@ const Role = sequelize.define('role_table', {
 
 
 
-module.exports = User, Role, USER_HAS_ROLE;
+module.exports={Role, User, USER_HAS_ROLE};
