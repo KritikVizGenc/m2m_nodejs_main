@@ -41,6 +41,70 @@ const USER_HAS_ROLE = sequelize.define('user_has_role', {
     }
   });
 
+const USER_INFORMATION = sequelize.define('user_information', {
+
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  profile_picture:{
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  about_me:{
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  city:{
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  tag_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  }
+
+  });
+
+const USER_HAS_INFO = sequelize.define('user_has_info', {
+    user_info_id :{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    user_id:{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+});
+
+const TAG_TABLE = sequelize.define('tag_table', {
+    tag_name:{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+});
+
+const USER_HAS_TAG = sequelize.define('user_has_tags', {
+    user_info_id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    user_tag_id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+})
+
+const PERMISSION_TABLE = sequelize.define('permission_table', {
+    description:{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+})
+
+
+
+
   Role.hasMany(User, {
     foreignKey: 'user_role'
   });
@@ -53,4 +117,4 @@ const USER_HAS_ROLE = sequelize.define('user_has_role', {
 
 
 
-module.exports={Role, User, USER_HAS_ROLE};
+module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE};

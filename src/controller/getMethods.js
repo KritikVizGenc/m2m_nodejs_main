@@ -17,7 +17,7 @@ router.get('/getAll/:userName', async (req, res) => {
     const user = await User.findAll({ where: { name: req.params.userName } })
 
     if(!user){
-       return res.status(404).json({message: 'hatalı'})
+       return res.status(404).json({message: 'bu ada sahip bir kullanıcı bulunamadı'})
     }
     return res.status(200).json(user);
 })
