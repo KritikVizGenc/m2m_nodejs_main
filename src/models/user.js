@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
 
-const User = sequelize.define('user_table', {
+const User =  sequelize.define('user_table', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -22,6 +22,7 @@ const User = sequelize.define('user_table', {
     type: DataTypes.INTEGER,
     allowNull: false,
   }
+  
 });
 
 const Role = sequelize.define('role_table', {
@@ -32,7 +33,6 @@ const Role = sequelize.define('role_table', {
   }
 });
 
-
 const USER_HAS_ROLE = sequelize.define('user_has_role', {
 
     user_id: {
@@ -40,6 +40,7 @@ const USER_HAS_ROLE = sequelize.define('user_has_role', {
       allowNull: false,
     }
   });
+
 
 const USER_INFORMATION = sequelize.define('user_information', {
 
@@ -85,13 +86,21 @@ const TAG_TABLE = sequelize.define('tag_table', {
 });
 
 const USER_HAS_TAG = sequelize.define('user_has_tags', {
+    id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
     user_info_id:{
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: false
     },
     user_tag_id:{
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: false,
+      
     },
 })
 
@@ -104,7 +113,6 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
 
 
 
-
   Role.hasMany(User, {
     foreignKey: 'user_role'
   });
@@ -114,6 +122,20 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
   Role.hasMany(USER_HAS_ROLE, {
     foreignKey: 'role_id'
   });
+  /////////////////////////////////////////////////
+  TAG_TABLE.belongsToMany(USER_INFORMATION, {
+    through: "user_has_tags",
+    as:"user_information",
+    foreignKey: "user_tag_id",
+  })
+  USER_INFORMATION.belongsToMany(TAG_TABLE, {
+    through: "user_has_tags",
+    as: "tag_table",
+    foreignKey: "user_info_id",
+  })
+  TAG_TABLE.hasOne(USER_INFORMATION, {
+    foreignKey: 'tag_id'
+  })
 
 
 

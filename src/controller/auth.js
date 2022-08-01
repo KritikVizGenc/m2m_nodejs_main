@@ -47,7 +47,7 @@ router.put('/updateUser/:id', async (req, res) => {
         const user = await User.update({name:req.body.name, surname:req.body.surname, email:req.body.email, user_role:req.body.user_role},
             {where: {id: req.params.id }})
             
-          
+        
 
             if(!userCheck){
                return res.status(404).json({message:"yok", userVarMi})

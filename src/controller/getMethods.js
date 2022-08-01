@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+
 router.get('/getAll', async (req, res) => {
 
     const user = await User.findAll();
