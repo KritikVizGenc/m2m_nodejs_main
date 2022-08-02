@@ -64,6 +64,7 @@ const USER_INFORMATION = sequelize.define('user_information', {
     type: DataTypes.INTEGER,
     allowNull: false
   }
+  
 
   });
 
@@ -112,7 +113,6 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
 })
 
 
-
   Role.hasMany(User, {
     foreignKey: 'user_role'
   });
@@ -136,7 +136,11 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
   TAG_TABLE.hasOne(USER_INFORMATION, {
     foreignKey: 'tag_id'
   })
+  User.hasOne(USER_INFORMATION, {
+    foreignKey: 'user_id'
+  })
 
 
+  sequelize.sync({ alter: true });
 
 module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE};
