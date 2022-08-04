@@ -2,10 +2,16 @@ const express = require("express");
 const {User} = require("../models/user")
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const authPassport = require('./authPassport')
-const passport = require('../auth/passport')
+const authPassport = require('./authPassport');
+const passport = require('../auth/passport');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const mime = require('mime');
+const { route } = require("./authPassport");
+
 
 const router = express.Router();
+
 
 router.post('/login', async (req, res) => {
 
@@ -40,11 +46,18 @@ router.post('/login', async (req, res) => {
 
 })
 
-router.put('/updateUser/:id', async (req, res) => {
+router.use(bodyParser.urlencoded({extended:false}));
+router.use(bodyParser.json());
+
+
+
+
+
+router.put('/updateUser/:id',  async (req, res) => {
 
     const userCheck = await User.findOne({where: {id: req.params.id}})
     
-        const user = await User.update({name:req.body.name, surname:req.body.surname, email:req.body.email, user_role:req.body.user_role},
+        const user = await User.update({name:req.body.name, surname:req.body.surname, email:req.body.email, user_role:req.body.user_role,avatar:req.body.avatar,about_me:req.body.about_me,city:req.body.city},
             {where: {id: req.params.id }})
             
         
@@ -57,7 +70,8 @@ router.put('/updateUser/:id', async (req, res) => {
 
 })
 
-router.delete('/deleteUser/:id',authPassport, async (req, res) => {
+
+router.delete('/deleteUser/:id',authPassport,   async (req, res) => {
 
     const user = await User.destroy({ where: { id: req.params.id } })
    
@@ -117,6 +131,8 @@ router.post("/logout",authPassport, async (req,res) => {
     res.clearCookie('token')
     res.status(200).json({message:"Successfully Logged Out"})
 });
+
+
 
 
 module.exports = router;

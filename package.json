@@ -9,20 +9,29 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "accesscontrol": "^2.2.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.1",
+    "easy": "^13.0.45",
     "express": "^4.18.1",
+    "express-fileupload": "^1.4.0",
     "helmet": "^5.1.1",
     "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.5.0",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-base64-image": "^2.0.4",
     "nodemailer": "^6.7.7",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.3",
-    "sequelize": "^6.21.3"
+    "rbac": "^5.0.3",
+    "rbacc": "^1.0.3",
+    "sequelize": "^6.21.3",
+    "sequelize-cli": "^6.4.1"
   }
 }

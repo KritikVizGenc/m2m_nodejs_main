@@ -1,13 +1,14 @@
 const express = require("express");
 const {User,Role,USER_HAS_ROLE,PERMISSION_TABLE,TAG_TABLE,USER_HAS_INFO,USER_HAS_TAG,USER_INFORMATION} = require("../models/user");
 const jwt = require('jsonwebtoken');
-
+const auth = require('../controller/auth');
 const router = express.Router();
 
 
-router.get('/getAll', async (req, res) => {
+router.get('/getAll', async (req, res,next) => {
 
     const user = await User.findAll();
+    
     if(!user){
         return res.status(404).json({message: 'hatalı'})
      }

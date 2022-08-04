@@ -1,5 +1,29 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
+////////////////////resim için eklenen yeni kısım//////////////////////////
+var fs = require('fs');
+function base64_encode(file) {
+  
+  var bitmap = fs.readFileSync(file);
+    
+    return new Buffer(bitmap).toString('base64');
+}
+
+
+function base64_decode(base64str, file) {
+    
+    var bitmap = new Buffer(base64str, 'base64');
+    
+    fs.writeFileSync(file, bitmap);
+    console.log('******** File created from base64 encoded string ********');
+}
+
+// convert image to base64 encoded string
+var base64str = base64_encode('src/models/default_m2m.jpg');
+console.log(base64str);
+// convert base64 string back to image 
+base64_decode(base64str, 'copy_default_m2m.jpg');
+
 
 const User =  sequelize.define('user_table', {
   name: {
@@ -21,7 +45,29 @@ const User =  sequelize.define('user_table', {
   user_role: {
     type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  avatar: {
+
+    type: DataTypes.STRING(10000000),
+    defaultValue: base64str,
+    allowNull: true
+
+  },
+  about_me:{
+    type: DataTypes.STRING(1000),
+    defaultValue:'',
+    allowNull:true
+
+  },
+  city:{
+
+    type: DataTypes.STRING,
+    defaultValue:'',
+    allowNull:true
+
   }
+
+  
   
 });
 
