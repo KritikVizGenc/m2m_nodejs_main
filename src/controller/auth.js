@@ -1,5 +1,5 @@
 const express = require("express");
-const {User} = require("../models/user")
+const {User, USER_HAS_TAG} = require("../models/user")
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const authPassport = require('./authPassport');
@@ -57,7 +57,7 @@ router.put('/updateUser/:id',  async (req, res) => {
 
     const userCheck = await User.findOne({where: {id: req.params.id}})
     
-        const user = await User.update({name:req.body.name, surname:req.body.surname, email:req.body.email, user_role:req.body.user_role,avatar:req.body.avatar,about_me:req.body.about_me,city:req.body.city},
+        const user = await User.update({name:req.body.name, surname:req.body.surname,avatar:req.body.avatar,about_me:req.body.about_me,city:req.body.city,work:req.body.work},
             {where: {id: req.params.id }})
             
         
@@ -70,19 +70,41 @@ router.put('/updateUser/:id',  async (req, res) => {
 
 })
 
+router.post("/chooseTag/:user_id", async(req,res) =>{
+
+    //const userCheck = await User.findOne({where: {id: req.params.id}})
+    const { user_tag_id } = req.body;
+    const newTag = new USER_HAS_TAG({user_id:req.params.user_id,user_tag_id: req.body.user_tag_id})
+
+    const savedTag = await newTag.save().catch((err) => {
+        console.log("Error: ", err)
+        res.status(404).json({error: "Cannot register user at the momnet!"})
+        
+    })
+
+    if(savedTag){
+        
+        res.status(201).json({newTag}); 
+
+    }
+     
+
+
+})
+
+
 
 router.delete('/deleteUser/:id',authPassport,   async (req, res) => {
 
     const user = await User.destroy({ where: { id: req.params.id } })
    
-   
-    
-    if(!user)
+   if(!user)
         return res.status(404).json({ message: 'User could not found' });
     
     res.status(200).json({ message: 'Successful'  }); 
 
 })
+
 
 
 router.post("/register", async (req,res) => {   
@@ -131,6 +153,8 @@ router.post("/logout",authPassport, async (req,res) => {
     res.clearCookie('token')
     res.status(200).json({message:"Successfully Logged Out"})
 });
+
+
 
 
 
