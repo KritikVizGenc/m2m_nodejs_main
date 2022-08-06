@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../database');
 
 const User =  sequelize.define('user_table', {
@@ -21,6 +21,13 @@ const User =  sequelize.define('user_table', {
   user_role: {
     type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  rating: {
+    
+    type: Sequelize.ARRAY(Sequelize.INTEGER),
+    defaultValue: [],
+    allowNull: true
+
   }
   
 });
@@ -112,6 +119,36 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
     },
 })
 
+const MENTOR_MENTEE_REL = sequelize.define('mentor_mentee_rel', {
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'user_tables',
+      key: 'id',
+    },
+  },
+  rel_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'user_tables',
+      key: 'id',
+    },
+  },
+})
+
+  MENTOR_MENTEE_REL.belongsTo(User, { as: 'myMentors', foreignKey: 'rel_id'});
+  MENTOR_MENTEE_REL.belongsTo(User, { as: 'myMentees', foreignKey: 'user_id'});
+  User.hasMany(MENTOR_MENTEE_REL);
+
+  
 
   Role.hasMany(User, {
     foreignKey: 'user_role'
@@ -143,4 +180,4 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
 
   sequelize.sync({ alter: true });
 
-module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE};
+module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE, MENTOR_MENTEE_REL};

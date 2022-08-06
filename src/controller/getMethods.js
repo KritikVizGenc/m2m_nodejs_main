@@ -102,7 +102,7 @@ router.get('/getByRole/:roleName', async (req, res) => {
     if(!user){
         return res.status(404).json({message: 'hatalı'})
      }
-    res.status(200).json(user);
+    res.status(200).json(user.user_tables);
 
 })
 
