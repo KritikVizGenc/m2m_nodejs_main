@@ -1,5 +1,5 @@
 const express = require("express");
-const {User} = require("../models/user")
+const {User, USER_HAS_TAG} = require("../models/user")
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const authPassport = require('./authPassport');
@@ -67,6 +67,27 @@ router.put('/updateUser/:id',  async (req, res) => {
             }
            return res.status(200).json({ message: 'Updated', user }); 
      
+
+})
+router.post("/chooseTag/:user_id", async(req,res) =>{
+
+    //const userCheck = await User.findOne({where: {id: req.params.id}})
+    const { user_tag_id } = req.body;
+    const newTag = new USER_HAS_TAG({user_id:req.params.user_id,user_tag_id: req.body.user_tag_id})
+
+    const savedTag = await newTag.save().catch((err) => {
+        console.log("Error: ", err)
+        res.status(404).json({error: "Cannot register user at the momnet!"})
+        
+    })
+
+    if(savedTag){
+        
+        res.status(201).json({newTag}); 
+
+    }
+     
+
 
 })
 

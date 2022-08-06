@@ -1,4 +1,5 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Sequelize  } = require('sequelize');
+
 const sequelize = require('../database');
 ////////////////////resim için eklenen yeni kısım//////////////////////////
 var fs = require('fs');
@@ -46,6 +47,7 @@ const User =  sequelize.define('user_table', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+
   avatar: {
 
     type: DataTypes.STRING(10000000),
@@ -53,6 +55,23 @@ const User =  sequelize.define('user_table', {
     allowNull: true
 
   },
+
+  
+  rating: {
+    
+    type: Sequelize.ARRAY(Sequelize.INTEGER),
+    defaultValue: [],
+    allowNull: true
+
+  },
+  avatar: {
+
+    type: DataTypes.STRING(10000000),
+    defaultValue: base64str,
+    allowNull: true
+
+  },
+
   about_me:{
     type: DataTypes.STRING(1000),
     defaultValue:'',
@@ -64,10 +83,21 @@ const User =  sequelize.define('user_table', {
     type: DataTypes.STRING,
     defaultValue:'',
     allowNull:true
+  },
+
+  
+
+  
+
+  work:{
+
+    type: DataTypes.STRING,
+    defaultValue:'',
+    allowNull : true
 
   }
 
-  
+
   
 });
 
@@ -88,42 +118,8 @@ const USER_HAS_ROLE = sequelize.define('user_has_role', {
   });
 
 
-const USER_INFORMATION = sequelize.define('user_information', {
 
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  profile_picture:{
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  about_me:{
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  city:{
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  tag_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  }
-  
 
-  });
-
-const USER_HAS_INFO = sequelize.define('user_has_info', {
-    user_info_id :{
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    user_id:{
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-});
 
 const TAG_TABLE = sequelize.define('tag_table', {
     tag_name:{
@@ -133,30 +129,107 @@ const TAG_TABLE = sequelize.define('tag_table', {
 });
 
 const USER_HAS_TAG = sequelize.define('user_has_tags', {
-    id:{
+    /*id:{
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
-    },
-    user_info_id:{
+    },*/
+    user_id:{
       type: DataTypes.INTEGER,
+      defaultValue:null,
       allowNull: false,
       primaryKey: false
     },
     user_tag_id:{
       type: DataTypes.INTEGER,
+      defaultValue:null,
       allowNull: false,
       primaryKey: false,
       
     },
 })
 
-const PERMISSION_TABLE = sequelize.define('permission_table', {
-    description:{
-      type: DataTypes.STRING,
-      allowNull: false,
+
+
+const MENTOR_MENTEE_REL = sequelize.define('mentor_mentee_rel', {
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'user_tables',
+      key: 'id',
     },
+  },
+  rel_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'user_tables',
+      key: 'id',
+    },
+  },
 })
+
+const Meetings = sequelize.define('meet_table',{
+  mentee_name: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  mentee_surname: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  meeting_date:  {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  start_time: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  end_time: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  
+  message: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+
+});
+const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true
+  },
+  user_meeting_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false
+  },
+  user_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false,
+    
+  },
+
+})
+
+
+  MENTOR_MENTEE_REL.belongsTo(User, { as: 'myMentors', foreignKey: 'rel_id'});
+  MENTOR_MENTEE_REL.belongsTo(User, { as: 'myMentees', foreignKey: 'user_id'});
+  User.hasMany(MENTOR_MENTEE_REL);
+
+  ////////////////////////////////////////////////
 
 
   Role.hasMany(User, {
@@ -169,24 +242,43 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
     foreignKey: 'role_id'
   });
   /////////////////////////////////////////////////
-  TAG_TABLE.belongsToMany(USER_INFORMATION, {
+
+  User.belongsToMany(TAG_TABLE,{
     through: "user_has_tags",
-    as:"user_information",
-    foreignKey: "user_tag_id",
-  })
-  USER_INFORMATION.belongsToMany(TAG_TABLE, {
+    as:"TAG_TABLE",
+    foreignKey:"user_id",
+  });
+
+  TAG_TABLE.belongsToMany(User,{
     through: "user_has_tags",
-    as: "tag_table",
-    foreignKey: "user_info_id",
+    as:"User",
+    foreignKey:"user_tag_id",
+  });
+
+  USER_HAS_TAG.hasMany(User, {
+    foreignKey: 'id'
+  });
+  USER_HAS_TAG.hasMany(TAG_TABLE, {
+    foreignKey: 'id'
+  });
+  ///////////////////////////////////////////
+  Meetings.belongsToMany(User,{
+    through: "user_has_meeting",
+    as:"user_table",
+    foreignKey: "user_meeting_id",
+
   })
-  TAG_TABLE.hasOne(USER_INFORMATION, {
-    foreignKey: 'tag_id'
-  })
-  User.hasOne(USER_INFORMATION, {
-    foreignKey: 'user_id'
-  })
+  User.belongsToMany(Meetings,{
+    through: "user_has_meeting",
+    as:"user_table",
+    foreignKey: "user_id",
+  }
+  )
 
 
   sequelize.sync({ alter: true });
 
-module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE};
+
+
+module.exports={Role, User, USER_HAS_ROLE, TAG_TABLE, USER_HAS_TAG, MENTOR_MENTEE_REL,Meetings,USER_HAS_Meetings};
+
