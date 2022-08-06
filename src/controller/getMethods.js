@@ -33,6 +33,7 @@ router.get('/getAllTag', async (req, res,next) => {
      }
     res.status(200).json(user);
 })
+
 router.get('/getTagbyUser',async(req,res)=>{
 
     const tags = await USER_HAS_TAG.findAll({include:{model:User} });
@@ -106,7 +107,8 @@ router.get('/getByRole/:roleName', async (req, res) => {
     if(!user){
         return res.status(404).json({message: 'hatalı'})
      }
-    res.status(200).json(user);
+     console.log(user.user_tables)
+    res.status(200).json(user.user_tables);
 
 })
 

@@ -95,3 +95,5 @@ router.post('/reqMentor/:mentorId', async (req, res) => {
       res.status(500).json({ error: { msg: 'Error in retrieving status' } });
     }
   });
+
+  module.exports = router;
