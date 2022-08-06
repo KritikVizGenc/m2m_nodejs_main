@@ -1,29 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database');
-////////////////////resim için eklenen yeni kısım//////////////////////////
-var fs = require('fs');
-function base64_encode(file) {
-  
-  var bitmap = fs.readFileSync(file);
-    
-    return new Buffer(bitmap).toString('base64');
-}
-
-
-function base64_decode(base64str, file) {
-    
-    var bitmap = new Buffer(base64str, 'base64');
-    
-    fs.writeFileSync(file, bitmap);
-    console.log('******** File created from base64 encoded string ********');
-}
-
-// convert image to base64 encoded string
-var base64str = base64_encode('src/models/default_m2m.jpg');
-console.log(base64str);
-// convert base64 string back to image 
-base64_decode(base64str, 'copy_default_m2m.jpg');
-
 
 const User =  sequelize.define('user_table', {
   name: {
@@ -45,29 +21,7 @@ const User =  sequelize.define('user_table', {
   user_role: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  },
-  avatar: {
-
-    type: DataTypes.STRING(10000000),
-    defaultValue: base64str,
-    allowNull: true
-
-  },
-  about_me:{
-    type: DataTypes.STRING(1000),
-    defaultValue:'',
-    allowNull:true
-
-  },
-  city:{
-
-    type: DataTypes.STRING,
-    defaultValue:'',
-    allowNull:true
-
   }
-
-  
   
 });
 
@@ -159,6 +113,65 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
 })
 
 
+const Meetings = sequelize.define('meet_table',{
+  
+  
+  
+  mentee_name: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  mentee_surname: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  meeting_date:  {
+    type: DataTypes.DATE,
+    allowNull: false,
+  },
+  start_time: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  end_time: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  
+  message: {
+    type: DataTypes.STRING,
+    allowNull:false
+  },
+  
+
+
+});
+
+const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true
+  },
+  user_meeting_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false
+  },
+  user_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false,
+    
+  },
+
+  
+
+})
+
+
+
+
   Role.hasMany(User, {
     foreignKey: 'user_role'
   });
@@ -169,6 +182,22 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
     foreignKey: 'role_id'
   });
   /////////////////////////////////////////////////
+  
+  Meetings.belongsToMany(User,{
+    through: "user_has_meeting",
+    as:"user_table",
+    foreignKey: "user_meeting_id",
+
+  })
+  User.belongsToMany(Meetings,{
+    through: "user_has_meeting",
+    as:"user_table",
+    foreignKey: "user_id",
+
+  }
+
+  )
+  
   TAG_TABLE.belongsToMany(USER_INFORMATION, {
     through: "user_has_tags",
     as:"user_information",
@@ -187,6 +216,6 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
   })
 
 
-  sequelize.sync({ alter: true });
+  //sequelize.sync({ alter: true });
 
-module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE};
+module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE,Meetings,USER_HAS_Meetings};
