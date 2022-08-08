@@ -68,6 +68,17 @@ router.get('/getTagbyUserbyId/:user_id',async(req,res)=>{
     res.status(200).json(tags);
 })
 
+router.get('/getTagbyTagbyId/:user_tag_id',async(req,res)=>{
+
+    const tags = await USER_HAS_TAG.findAll({where:{user_tag_id:req.params.user_tag_id},include:{model:User} });
+
+    if(!tags){
+        return res.status(404),json({message:'Unable to do this'})
+    }
+
+    res.status(200).json(tags);
+})
+
 
 
 /*router.get('/getTags/:tagId', async (req, res) => {

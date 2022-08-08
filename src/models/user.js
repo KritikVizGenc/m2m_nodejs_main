@@ -76,10 +76,6 @@ const User =  sequelize.define('user_table', {
   }
 
 
-
-
-  
-
 });
 
 const Role = sequelize.define('role_table', {
