@@ -56,6 +56,11 @@ const User =  sequelize.define('user_table', {
 
   },
 
+  ratingAverage: {
+    type: DataTypes.DOUBLE,
+    defaultValue: 0,
+    allowNull: true
+  },
   
   rating: {
     

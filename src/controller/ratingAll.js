@@ -23,8 +23,11 @@ router.put('/rate/:mId', async (req, res) => {
                 }
                 average = sum / findUser.rating.length;
 
+         const userWithAverage = await User.update({ratingAverage: average.toFixed(0)},
+            {where: {id: mId }})
 
-    res.status(200).json({findUser}); 
+
+    res.status(200).json({userWithAverage}); 
 
 })
 

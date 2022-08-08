@@ -50,9 +50,6 @@ router.use(bodyParser.urlencoded({extended:false}));
 router.use(bodyParser.json());
 
 
-
-
-
 router.put('/updateUser/:id',  async (req, res) => {
 
     const userCheck = await User.findOne({where: {id: req.params.id}})

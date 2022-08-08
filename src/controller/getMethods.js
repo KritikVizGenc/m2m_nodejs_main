@@ -60,7 +60,7 @@ router.get('/getTagbyUserbyId/:user_id',async(req,res)=>{
     const tags = await USER_HAS_TAG.findOne({where:{user_id:req.params.user_id},include:{model:User} });
 
     if(!tags){
-        return res.status(404),json({message:'Unable to do this'})
+        return res.status(404).json({message:'Unable to do this'})
     }
 
     res.status(200).json(tags);
@@ -78,7 +78,7 @@ router.get('/getAll/limit=:limits/offset=:offsets', async (req, res) => {
 
 router.get('/getById/:userId', async (req, res) => {
 
-    const user = await User.findOne({ where: { id: req.params.userId } })
+    const user = await User.findAll({ where: { id: req.params.userId } })
 
     if(!user){
        return res.status(404).json({message: 'hatalı'})
