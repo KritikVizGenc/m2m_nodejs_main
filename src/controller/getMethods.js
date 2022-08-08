@@ -1,5 +1,5 @@
 const express = require("express");
-const {User,Role,USER_HAS_ROLE,PERMISSION_TABLE,TAG_TABLE,USER_HAS_INFO,USER_HAS_TAG,USER_INFORMATION,Meetings} = require("../models/user");
+const {User,Role,USER_HAS_ROLE,PERMISSION_TABLE,TAG_TABLE,USER_HAS_INFO,USER_HAS_TAG,USER_INFORMATION,Meetings,Comments} = require("../models/user");
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
@@ -126,10 +126,9 @@ router.get('/getByRole/:roleName/:id', async (req, res) => {
     res.status(200).json(user);
 })
 
-
 /////Meeting operations////
 
-router.post('/meet', async (req,res) => {   
+router.post('/createMeet/:createdByid', async (req,res) => {   
     
     const { mentee_name,mentee_surname,meeting_date, start_time,end_time,message} = req.body; //tablodan çekilecek veriler
     const alreadyExistMeeting = await Meetings.findOne({ where: { start_time } }).catch((err) => {
@@ -140,7 +139,8 @@ router.post('/meet', async (req,res) => {
     };
 
 
-    const newMeeting = new Meetings({  mentee_name,mentee_surname,meeting_date, start_time, end_time, message });
+    let createdById = req.params.createdByid;
+    const newMeeting = new Meetings({  mentee_name,mentee_surname,meeting_date, start_time, end_time, message ,createdById});
     const savedMeeting = await newMeeting.save().catch((err) => {
         console.log("Error: ", err)
         res.status(404).json({error: "Cannot set a meeting   at the moment!"})
@@ -154,9 +154,25 @@ router.post('/meet', async (req,res) => {
 
 
 })
+
 router.get('/getMeeting', async (req, res) => {
 
     const meeting = await Meetings.findAll();
+    if(!meeting){
+        return res.status(404).json({message: 'hatalı'})
+     }
+    res.status(200).json(meeting);
+})
+
+/*router.get('/getMeeting/:meetingId', async (req, res) => {
+    const meeting = await Meetings.findByPk(req.params.meetingId);
+    if(!meeting){
+        return res.status(404).json({message: 'hatalı'})
+     }
+    res.status(200).json(meeting);
+})*/
+router.get('/getMeeting/:createdById', async (req, res) => {
+    const meeting = await Meetings.findAll({ where:{createdById: req.params.createdById} });
     if(!meeting){
         return res.status(404).json({message: 'hatalı'})
      }
@@ -189,5 +205,40 @@ router.delete('/deleteMeeting/:id', async (req, res) => {
     res.status(200).json({ message: 'Successful'  }); 
 
 })
+
+/////Comments Operations/////
+
+
+// CREATE Comment
+router.post('/addComment/:ownerId/:authorId', async (req,res) => {   
+    
+    const { comment_content} = req.body; 
+    let owner_id= req.params.ownerId;
+    let author_id= req.params.authorId;
+    const newComment = new Comments({  comment_content,owner_id,author_id});
+    const savedComment = await newComment.save().catch((err) => {
+        console.log("Error: ", err)
+        res.status(404).json({error: "Cannot add a comment   at the moment!"})
+    
+    })
+
+    if(savedComment){
+
+        res.status(201).json({newComment});
+    }
+
+
+})
+
+router.get('/getComment/:ownerId', async (req, res) => {
+
+    const comments = await Comments.findAll({ where: { owner_id: req.params.ownerId } })
+
+    if(!comments){
+       return res.status(404).json({message: 'hatalı'})
+    }
+    return res.status(200).json(comments);
+})
+
 
 module.exports = router;
