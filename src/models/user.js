@@ -112,39 +112,42 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
     },
 })
 
-
 const Meetings = sequelize.define('meet_table',{
-  
-  
-  
   mentee_name: {
     type: DataTypes.STRING,
-    allowNull:false
+    allowNull:false,
+    defaultValue:""
   },
   mentee_surname: {
     type: DataTypes.STRING,
-    allowNull:false
+    allowNull:false,
+    defaultValue:""
   },
   meeting_date:  {
     type: DataTypes.DATE,
     allowNull: false,
+    
   },
   start_time: {
     type: DataTypes.TIME,
     allowNull: false,
+   
   },
   end_time: {
     type: DataTypes.TIME,
     allowNull: false,
+    
   },
   
   message: {
     type: DataTypes.STRING,
-    allowNull:false
+    allowNull:false,
+    defaultValue:""
   },
-  
-
-
+  createdById:{
+    type:DataTypes.INTEGER,
+    allowNull:false,
+  }
 });
 
 const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
@@ -164,10 +167,54 @@ const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
     primaryKey: false,
     
   },
-
-  
-
+ 
 })
+
+const Comments = sequelize.define('comment_table', {
+  
+  comment_content:{
+    type: DataTypes.STRING,
+    defaultValue:'',
+    allowNull: false,
+   
+  },
+  owner_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false,
+    
+  },
+  author_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false,
+    
+  },
+  
+ 
+})
+
+const Owner_Has_Comments = sequelize.define('owner_has_comment', {
+  id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true
+  },
+  user_comment_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false
+  },
+  user_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: false,
+    
+  },
+ 
+})
+
+
 
 
 
@@ -185,18 +232,38 @@ const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
   
   Meetings.belongsToMany(User,{
     through: "user_has_meeting",
-    as:"user_table",
+    as:"User",
     foreignKey: "user_meeting_id",
 
   })
   User.belongsToMany(Meetings,{
     through: "user_has_meeting",
-    as:"user_table",
+    as:"Meetings",
     foreignKey: "user_id",
 
-  }
+  })
+  User.hasMany(Meetings,{
+    foreignKey:'createdById'
+  })
+///Comment operations/////
+  Comments.belongsToMany(User,{
+    through: "owner_has_comment",
+    as:"User",
+    foreignKey: "user_comment_id",
 
-  )
+  })
+  User.belongsToMany(Comments,{
+    through: "owner_has_comment",
+    as:"comment_table",
+    foreignKey: "user_id",
+
+  })
+  User.hasMany(Comments,{
+    foreignKey:'owner_id'
+  })
+  User.hasMany(Comments,{
+    foreignKey:'author_id'
+  })
   
   TAG_TABLE.belongsToMany(USER_INFORMATION, {
     through: "user_has_tags",
@@ -218,4 +285,4 @@ const USER_HAS_Meetings = sequelize.define('user_has_meeting', {
 
   //sequelize.sync({ alter: true });
 
-module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE,Meetings,USER_HAS_Meetings};
+module.exports={Role, User, USER_HAS_ROLE, USER_INFORMATION, USER_HAS_INFO, TAG_TABLE, USER_HAS_TAG, PERMISSION_TABLE,Meetings,USER_HAS_Meetings,Comments,Owner_Has_Comments};
