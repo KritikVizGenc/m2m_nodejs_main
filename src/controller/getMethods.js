@@ -3,6 +3,7 @@ const {User,Role,USER_HAS_ROLE,PERMISSION_TABLE,TAG_TABLE,USER_HAS_TAG} = requir
 const jwt = require('jsonwebtoken');
 const auth = require('../controller/auth');
 const { json } = require("body-parser");
+const { model } = require("mongoose");
 const router = express.Router();
 
 
@@ -37,7 +38,7 @@ router.get('/getAllTag', async (req, res,next) => {
 
 router.get('/getTagbyUser',async(req,res)=>{
 
-    const tags = await USER_HAS_TAG.findAll({include:{model:User} });
+    const tags = await USER_HAS_TAG.findAll({include:[{model:User,as:'user_tag'},{model:TAG_TABLE,as:'tag_tag'}],raw:true});
 
     if(!tags){
         return res.status(404),json({message:'Unable to do this'})
@@ -46,20 +47,10 @@ router.get('/getTagbyUser',async(req,res)=>{
     res.status(200).json(tags);
 })
 
-router.get('/getTagbyTag',async(req,res)=>{
 
-    const tags = await USER_HAS_TAG.findAll({include:{model:TAG_TABLE} });
+router.get('/getTagID/:tag_id',async(req,res)=>{
 
-    if(!tags){
-        return res.status(404),json({message:'Unable to do this'})
-    }
-
-    res.status(200).json(tags);
-})
-
-router.get('/getTagbyUserbyId/:user_id',async(req,res)=>{
-
-    const tags = await USER_HAS_TAG.findOne({where:{user_id:req.params.user_id},include:{model:User} });
+    const tags = await USER_HAS_TAG.findAll({where:{tag_id:req.params.tag_id},include:[{model:TAG_TABLE,as:'tag_tag'},{model:User,as:'user_tag'}],raw:true });
 
     if(!tags){
         return res.status(404),json({message:'Unable to do this'})
@@ -68,15 +59,17 @@ router.get('/getTagbyUserbyId/:user_id',async(req,res)=>{
     res.status(200).json(tags);
 })
 
-router.get('/getTagbyTagbyId/:user_tag_id',async(req,res)=>{
+router.get('/getTagbyUser/:user_id',async(req,res)=>{
 
-    const tags = await USER_HAS_TAG.findAll({where:{user_tag_id:req.params.user_tag_id},include:{model:User} });
+    const tags = await USER_HAS_TAG.findAll({where:{user_id:req.params.user_id},include:[{model:User,as:'user_tag'},{model:TAG_TABLE,as:'tag_tag'}],raw:true});
+    
 
     if(!tags){
         return res.status(404),json({message:'Unable to do this'})
     }
 
-    res.status(200).json(tags);
+    res.status(200).json(tags); 
+
 })
 
 

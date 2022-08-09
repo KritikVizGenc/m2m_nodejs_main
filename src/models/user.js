@@ -1,7 +1,11 @@
-const { DataTypes } = require('sequelize');
+"use strict";
+var md5 = require('md5');
+
+const { DataTypes, Sequelize } = require('sequelize');
 const sequelize = require('../database');
 ////////////////////resim için eklenen yeni kısım//////////////////////////
 var fs = require('fs');
+const { timeStamp } = require('console');
 function base64_encode(file) {
   
   var bitmap = fs.readFileSync(file);
@@ -73,10 +77,37 @@ const User =  sequelize.define('user_table', {
     defaultValue:'',
     allowNull : true
 
+  },
+  socketID:{
+    type:DataTypes.STRING(255),
+    defaultValue:null,
+    allowNull:true
   }
+    }
+  ,
+{
+timesStamps:false,
+freezeTableName:true,
+tableName:'user_table'
+}
+,{
+  clasMethods:{
+    associate:function(models){
 
-
+    }
+  }
 });
+
+User.associate = function(models){
+  User.hasMany(models.messages,{
+    onDelete:"CASCADE",
+    foreignKey:'sender_id',
+    targetKey:'id',
+    as:'userMessages'
+  });
+};
+
+
 
 const Role = sequelize.define('role_table', {
 
@@ -102,30 +133,107 @@ const TAG_TABLE = sequelize.define('tag_table', {
       type: DataTypes.STRING,
       allowNull: false,
     },
+  
 });
 
 const USER_HAS_TAG = sequelize.define('user_has_tags', {
-    /*id:{
+    id:{
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
-    },*/
-    user_id:{
-      type: DataTypes.INTEGER,
-      defaultValue:null,
-      allowNull: false,
-      primaryKey: false
+      primaryKey: true,
+      autoIncrement: true
     },
-    user_tag_id:{
+   user_id:{
       type: DataTypes.INTEGER,
-      defaultValue:null,
       allowNull: false,
-      primaryKey: false,
+      references:{
+        model:'user_table',
+        key:'id'
+
+      }
+     
+    },
+    tag_id:{
+      type: DataTypes.INTEGER,
+     allowNull: false,
+     references:{
+
+      model:'tag_table',
+      key:'id'
+
+     }
       
     },
 })
 
+const messages = sequelize.define('messages',{
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED ,
+    primaryKey: true ,
+    autoIncrement: true
+},
+message_subject : {
+    type:DataTypes.STRING
+},
+message_body :{
+    type: DataTypes.TEXT,
+    allowNull:false
+} ,
+sender_id : {
+    type: DataTypes.INTEGER.UNSIGNED ,
+    allowNull: false,
+    references: {
+        model: "user_table",
+        key: "id"
+    }
+},
+receiver_id :{
+    type: DataTypes.INTEGER.UNSIGNED ,
+    allowNull: false,
+    references: {
+        model: "user_table",
+        key: "id"
+    }
+},
+conversation_id : {
+    type:DataTypes.STRING,
+    allowNull : false
+} ,
+created_at : {
+    type: 'TIMESTAMP' ,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
+},
+updated_at :{
+    type: 'TIMESTAMP' ,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
+},
+viewed : DataTypes.BOOLEAN
+},
+{
+timestamps: false,
+freezeTableName:true,
+  tableName: 'messages'
+}, {
+classMethods: {
+  associate: function(models) {
+  }
+}
+});
+messages.associate = function(models) {
+    messages.belongsTo(models.User, {
+        onDelete: "CASCADE",
+        foreignKey:  'sender_id',
+        targetKey: 'id',
+        as :'user_table'
+    });
+};
 
+
+
+
+////////////ROL KISMI////////////////
   Role.hasMany(User, {
     foreignKey: 'user_role'
   });
@@ -135,7 +243,7 @@ const USER_HAS_TAG = sequelize.define('user_has_tags', {
   Role.hasMany(USER_HAS_ROLE, {
     foreignKey: 'role_id'
   });
-  /////////////////////////////////////////////////
+  ///////////////////TAG KISMI//////////////////////////////
   User.belongsToMany(TAG_TABLE,{
     through: "user_has_tags",
     as:"TAG_TABLE",
@@ -145,36 +253,19 @@ const USER_HAS_TAG = sequelize.define('user_has_tags', {
   TAG_TABLE.belongsToMany(User,{
     through: "user_has_tags",
     as:"User",
-    foreignKey:"user_tag_id",
+    foreignKey:"tag_id",
   });
 
-  USER_HAS_TAG.hasMany(User, {
-    foreignKey: 'id'
-  });
-  USER_HAS_TAG.hasMany(TAG_TABLE, {
-    foreignKey: 'id'
-  });
   
-  /*User.hasOne(TAG_TABLE, {
-    foreignKey: 'tag_id'
-  })
+  USER_HAS_TAG.belongsTo(User,{as:'user_tag',foreignKey:'user_id'});
+  User.hasMany(USER_HAS_TAG);
+  USER_HAS_TAG.belongsTo(TAG_TABLE,{as:'tag_tag',foreignKey:'tag_id'});
+  TAG_TABLE.hasMany(USER_HAS_TAG);
+
+  /////////////////Chat Kısmı//////////////////////7
+
   
-  TAG_TABLE.hasOne(User, {
-    foreignKey: 'tag_id'
-  })*/
   
-  /*TAG_TABLE.belongsToMany(User, {
-    through: "user_has_tags",
-    as:"User",
-    foreignKey: "user_tag_id",
-  })
-  User.belongsToMany(TAG_TABLE, {
-    through: "user_has_tags",
-    as: "tag_table",
-    foreignKey: "user_id",
-  })
-  
-  */
 
 
   sequelize.sync({ alter: true });
