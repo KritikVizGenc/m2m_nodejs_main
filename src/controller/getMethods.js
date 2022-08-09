@@ -130,7 +130,7 @@ router.get('/getByRole/:roleName/:id', async (req, res) => {
 
 router.post('/createMeet/:createdByid', async (req,res) => {   
     
-    const { mentee_name,mentee_surname,meeting_date, start_time,end_time,message} = req.body; //tablodan çekilecek veriler
+    const { mentee_id,meeting_date, start_time,end_time,message} = req.body; //tablodan çekilecek veriler
     const alreadyExistMeeting = await Meetings.findOne({ where: { start_time } }).catch((err) => {
         console.log(err)
     });
@@ -140,7 +140,7 @@ router.post('/createMeet/:createdByid', async (req,res) => {
 
 
     let createdById = req.params.createdByid;
-    const newMeeting = new Meetings({  mentee_name,mentee_surname,meeting_date, start_time, end_time, message ,createdById});
+    const newMeeting = new Meetings({  mentee_id,meeting_date, start_time, end_time, message ,createdById,include:[{model:User}]});
     const savedMeeting = await newMeeting.save().catch((err) => {
         console.log("Error: ", err)
         res.status(404).json({error: "Cannot set a meeting   at the moment!"})
@@ -154,7 +154,6 @@ router.post('/createMeet/:createdByid', async (req,res) => {
 
 
 })
-
 router.get('/getMeeting', async (req, res) => {
 
     const meeting = await Meetings.findAll();
@@ -172,7 +171,13 @@ router.get('/getMeeting', async (req, res) => {
     res.status(200).json(meeting);
 })*/
 router.get('/getMeeting/:createdById', async (req, res) => {
-    const meeting = await Meetings.findAll({ where:{createdById: req.params.createdById} });
+    const meeting = await Meetings.findAll({ where:{createdById: req.params.createdById},include:[{model:User,as :'mentees',attributes:[
+        "id",
+        "name",
+        "surname",
+        "user_role"
+    ]
+    }],raw:true});
     if(!meeting){
         return res.status(404).json({message: 'hatalı'})
      }
@@ -207,15 +212,10 @@ router.delete('/deleteMeeting/:id', async (req, res) => {
 })
 
 /////Comments Operations/////
-
-
 // CREATE Comment
-router.post('/addComment/:ownerId/:authorId', async (req,res) => {   
-    
-    const { comment_content} = req.body; 
-    let owner_id= req.params.ownerId;
-    let author_id= req.params.authorId;
-    const newComment = new Comments({  comment_content,owner_id,author_id});
+router.post('/addComment', async (req,res) => {   
+    const { comment_content,owner_id,author_id} = req.body; 
+    const newComment = new Comments({  comment_content,owner_id,author_id,include:[{model:User}]});
     const savedComment = await newComment.save().catch((err) => {
         console.log("Error: ", err)
         res.status(404).json({error: "Cannot add a comment   at the moment!"})
@@ -231,9 +231,13 @@ router.post('/addComment/:ownerId/:authorId', async (req,res) => {
 })
 
 router.get('/getComment/:ownerId', async (req, res) => {
-
-    const comments = await Comments.findAll({ where: { owner_id: req.params.ownerId } })
-
+    const comments = await Comments.findAll({ where: { owner_id: req.params.ownerId} ,include:[{model:User,as :'author_comments',attributes:[
+        "id",
+        "name",
+        "surname",
+        "user_role"
+    ]
+    }],raw:true})
     if(!comments){
        return res.status(404).json({message: 'hatalı'})
     }
