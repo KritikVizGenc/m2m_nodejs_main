@@ -113,15 +113,9 @@ const PERMISSION_TABLE = sequelize.define('permission_table', {
 })
 
 const Meetings = sequelize.define('meet_table',{
-  mentee_name: {
-    type: DataTypes.STRING,
-    allowNull:false,
-    defaultValue:""
-  },
-  mentee_surname: {
-    type: DataTypes.STRING,
-    allowNull:false,
-    defaultValue:""
+  mentee_id:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
   meeting_date:  {
     type: DataTypes.DATE,
@@ -242,9 +236,9 @@ const Owner_Has_Comments = sequelize.define('owner_has_comment', {
     foreignKey: "user_id",
 
   })
-  User.hasMany(Meetings,{
-    foreignKey:'createdById'
-  })
+  Meetings.belongsTo(User, { as: 'mentees', foreignKey: 'mentee_id'});
+  Meetings.belongsTo(User, { as: 'mentor', foreignKey: 'createdById'});
+  User.hasMany(Meetings);
 ///Comment operations/////
   Comments.belongsToMany(User,{
     through: "owner_has_comment",
@@ -258,12 +252,9 @@ const Owner_Has_Comments = sequelize.define('owner_has_comment', {
     foreignKey: "user_id",
 
   })
-  User.hasMany(Comments,{
-    foreignKey:'owner_id'
-  })
-  User.hasMany(Comments,{
-    foreignKey:'author_id'
-  })
+  Comments.belongsTo(User, { as: 'author_comments', foreignKey: 'author_id'});
+  Comments.belongsTo(User, { as: 'owner_comments', foreignKey: 'owner_id'});
+  User.hasMany(Comments);
   
   TAG_TABLE.belongsToMany(USER_INFORMATION, {
     through: "user_has_tags",
