@@ -177,7 +177,12 @@ router.get('/getMeeting/:createdById', async (req, res) => {
         "surname",
         "user_role"
     ]
-    }],raw:true});
+    },{model:User,as:'mentor',attributes:[
+        "id",
+        "name",
+        "surname",
+        "user_role"
+    ]}],raw:true});
     if(!meeting){
         return res.status(404).json({message: 'hatalı'})
      }
