@@ -22,18 +22,18 @@ router.post('/login', async (req, res) => {
         console.log("Error ", err)
 
     });
+    if(!userWithEmail)
+    return res.status(404).json({ message: 'Email or password does not match!' });
 
     const isPasswordCorrect = bcrypt.compareSync(
         password,
         userWithEmail.password
       );
-
-    if(!userWithEmail)
-        return res.status(404).json({ message: 'Email or password does not match!' });
     
     if(!isPasswordCorrect)
         return res.status(404).json({ message: 'Email or password does not match!' });
-    
+
+   
     const jwtToken = jwt.sign({ id: userWithEmail.id, email: userWithEmail.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie('token', jwtToken, { maxAge: 900000, httpOnly: true });
@@ -69,23 +69,18 @@ router.put('/updateUser/:id',  async (req, res) => {
 router.post("/chooseTag/:user_id", async(req,res) =>{
 
     //const userCheck = await User.findOne({where: {id: req.params.id}})
-    const { user_tag_id } = req.body;
-    const newTag = new USER_HAS_TAG({user_id:req.params.user_id,user_tag_id: req.body.user_tag_id})
+    
+    const newTag = new USER_HAS_TAG({user_id:req.params.user_id,tag_id: req.body.tag_id})
 
     const savedTag = await newTag.save().catch((err) => {
         console.log("Error: ", err)
-        res.status(404).json({error: "Cannot register user at the momnet!"})
-        
+        res.status(404).json({error: "You cannot choose the same tag.Please choose another one !"})    
     })
 
-    if(savedTag){
+   if(savedTag){
         
         res.status(201).json({newTag}); 
-
     }
-     
-
-
 })
 
 

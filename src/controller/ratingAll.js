@@ -53,4 +53,22 @@ router.get('/ratingScore/:mId', async (req, res) => {
 
 })
 
+router.get('/topMentors/:roleId', async (req, res) => {
+
+    const { roleId } = req.params;
+
+            const findUser = await User.findAll(
+                {where: {id: roleId }})
+
+            var sum = 0;
+                for (var number of findUser.rating) {
+                    sum += number;
+                }
+                average = sum / findUser.rating.length;
+
+
+    res.status(200).json( {message: `${average.toFixed(1)}`}); 
+
+})
+
 module.exports = router;
