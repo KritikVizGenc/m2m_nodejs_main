@@ -370,11 +370,38 @@ User.hasMany(Meetings);
     foreignKey: "user_id",
   }
   )
-
+/////////////////favoriiii
+  const Mentee_fav_mentor = sequelize.define('mentee_Favs', {
+    id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user_tables',
+        key: 'id',
+      },
+    },
+    fav_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'user_tables',
+        key: 'id',
+      },
+    },
+  })
+  Mentee_fav_mentor.belongsTo(User, { as: 'favMentors', foreignKey: 'fav_id'});
+  User.hasMany(Mentee_fav_mentor);
+/////////// end favori
 
   sequelize.sync({ alter: true });
 
 
 
-module.exports={Role, User, USER_HAS_ROLE, TAG_TABLE, USER_HAS_TAG, MENTOR_MENTEE_REL,Meetings,USER_HAS_Meetings,Comments,Owner_Has_Comments};
+module.exports={Role, User, USER_HAS_ROLE, TAG_TABLE, USER_HAS_TAG, MENTOR_MENTEE_REL,Meetings,USER_HAS_Meetings,Comments,Owner_Has_Comments,Mentee_fav_mentor};
 
