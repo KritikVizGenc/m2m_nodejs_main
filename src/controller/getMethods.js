@@ -1,5 +1,5 @@
 const express = require("express");
-const {User,Role,USER_HAS_ROLE,TAG_TABLE,USER_HAS_TAG,Comments,Meetings, } = require("../models/user");
+const {User,Role,USER_HAS_ROLE,TAG_TABLE,USER_HAS_TAG,Comments,Meetings,Mentee_fav_mentor } = require("../models/user");
 const jwt = require('jsonwebtoken');
 const auth = require('../controller/auth');
 const { Op } = require("sequelize");
